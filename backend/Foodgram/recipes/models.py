@@ -35,6 +35,30 @@ class Tag(models.Model):
         return self.name
 
 
+class Ingredient(models.Model):
+    """Модель ингредиентов"""
+    name = models.CharField(
+        blank=False, max_length=200, verbose_name='Ингредиенты'
+    )
+    measurement_unit = models.CharField(
+        blank=False, max_length=200, verbose_name='Единицы измерения'
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+        ordering = ['name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_measurement_unit'
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Recipe(models.Model):
     """Модель рецепта"""
     author = models.ForeignKey(
@@ -54,11 +78,16 @@ class Recipe(models.Model):
         auto_now_add=True,
         verbose_name='Дата публикации'
     )
-    # ingredients =
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        blank=False,
+        through='IngredientRecipe',
+        verbose_name='Список ингредиентов',
+    )
     tags = models.ManyToManyField(
         Tag,
         blank=False,
-        through='TagReciepe',
+        through='TagRecipe',
         verbose_name='Список тегов',
     )
     cooking_time = models.IntegerField(
@@ -74,10 +103,23 @@ class Recipe(models.Model):
         return self.text[:15]
 
 
-class TagReciepe(models.Model):
-    """Модель для связи id Tag и id Reciepe."""
+class TagRecipe(models.Model):
+    """Модель для связи id Tag и id Recipe."""
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    reciepe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.tag} {self.reciepe}'
+        return f'{self.tag} {self.recipe}'
+
+
+class IngredientRecipe(models.Model):
+    """Модель для связи id Ingredient, id Recipe и кол-ва ингредиентов."""
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    amount = models.IntegerField(
+        validators=[MinValueValidator(0)],
+        verbose_name='Количество ингредиента'
+    )
+
+    def __str__(self):
+        return f'{self.ingredient} {self.recipe}'
