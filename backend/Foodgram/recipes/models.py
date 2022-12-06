@@ -1,6 +1,8 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+from .validators import validate_color
 
 User = get_user_model()
 
@@ -10,8 +12,12 @@ class Tag(models.Model):
     name = models.CharField(
         blank=False, max_length=200, verbose_name='Название'
     )
-    color = models.CharField(
-        blank=False, max_length=7, verbose_name='Цвет в HEX'
+    color = ColorField(
+        validators=[validate_color],
+        max_length=7,
+        verbose_name='Цвет в HEX',
+        blank=False,
+        default='#FFFFE0'
     )
     slug = models.SlugField(
         blank=False,
@@ -56,7 +62,7 @@ class Ingredient(models.Model):
         ]
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.measurement_unit}'
 
 
 class Recipe(models.Model):
@@ -105,8 +111,16 @@ class Recipe(models.Model):
 
 class TagRecipe(models.Model):
     """Модель для связи id Tag и id Recipe."""
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='tag_recipe',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_tag',
+    )
 
     def __str__(self):
         return f'{self.tag} {self.recipe}'
@@ -114,9 +128,17 @@ class TagRecipe(models.Model):
 
 class IngredientRecipe(models.Model):
     """Модель для связи id Ingredient, id Recipe и кол-ва ингредиентов."""
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    amount = models.IntegerField(
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='ingredient_recipe'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredient'
+    )
+    amount = models.FloatField(
         validators=[MinValueValidator(0)],
         verbose_name='Количество ингредиента'
     )
