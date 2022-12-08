@@ -77,8 +77,13 @@ class Recipe(models.Model):
     name = models.CharField(
         blank=False, max_length=200, verbose_name='Название'
     )
-    # image = models.ImageField(
-    #    verbose_name="Картинка", upload_to='posts/', blank=False)
+    image = models.ImageField(
+        upload_to='recipes/images/',
+        blank=False,
+        null=True,
+        default=None,
+        verbose_name='Фото'
+    )
     text = models.TextField(blank=False, verbose_name='Текст поста')
     pub_date = models.DateTimeField(
         auto_now_add=True,

@@ -32,10 +32,10 @@ class IngredientInline(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     """Управление рецептами в админке"""
     list_display = (
-        'author', 'name', 'text', 'pub_date',
+        'author', 'name', 'image', 'text', 'pub_date',
         'cooking_time', 'display_tags', 'display_ingredients'
     )
-    list_editable = ('text', 'cooking_time',)
+    list_editable = ('text', 'cooking_time', 'image')
     list_filter = ('name', 'author', 'tags', 'ingredients')
     search_fields = ('name', 'text', 'ingredients')
     inlines = [
