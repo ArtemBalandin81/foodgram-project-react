@@ -1,7 +1,15 @@
 from django.contrib import admin
 
 from .models import Tag, Recipe, TagRecipe, IngredientRecipe, Ingredient
+from users.models import User
 
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'password')
+    list_editable = ('email',)
+    list_filter = ('username', 'email')
+    search_fields = ('username', 'email')
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -35,7 +43,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'author', 'name', 'image', 'text', 'pub_date',
         'cooking_time', 'display_tags', 'display_ingredients'
     )
-    list_editable = ('text', 'cooking_time', 'image')
+    list_editable = ('cooking_time', 'image')
     list_filter = ('name', 'author', 'tags', 'ingredients')
     search_fields = ('name', 'text', 'ingredients')
     inlines = [

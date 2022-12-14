@@ -4,10 +4,13 @@ from django.views.generic import TemplateView
 
 from django.conf import settings
 from django.conf.urls.static import static
+#from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('users.urls', namespace='users')),
     path('api/', include('api.urls', namespace='api')),
+    path('auth/', include('django.contrib.auth.urls')),
     path(
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),

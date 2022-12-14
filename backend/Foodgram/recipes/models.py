@@ -3,8 +3,10 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from .validators import validate_color
+from users.models import (User,)
 
-User = get_user_model()
+# Используем свою модель пользователи из приложения users!!!
+#User = get_user_model()
 
 
 class Tag(models.Model):
@@ -84,7 +86,7 @@ class Recipe(models.Model):
         default=None,
         verbose_name='Фото'
     )
-    text = models.TextField(blank=False, verbose_name='Текст поста')
+    text = models.TextField(blank=False, verbose_name='Текст рецепта')
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'

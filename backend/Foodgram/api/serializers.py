@@ -1,10 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from djoser.serializers import UserSerializer, UserCreateSerializer
 
 from recipes.models import (
-    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, User
+    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe
 )
+from users.models import User
 import base64
 from django.core.files.base import ContentFile
 # from recipes.validators import validate_color
@@ -57,6 +59,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Recipe."""
+    author = UserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     #ingredients = IngredientSerializer(many=True, read_only=True)
     ingredients = IngredientRecipeSerializer(
