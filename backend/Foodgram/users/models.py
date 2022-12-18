@@ -15,7 +15,6 @@ class User(AbstractUser):
     ]
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
-    #REQUIRED_FIELDS = ['email']
     username = models.CharField(
         validators=[check_username],
         max_length=NAME_MAX_LENGTH,
@@ -47,3 +46,38 @@ class User(AbstractUser):
         ordering = ['username']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+
+class Follow(models.Model):
+    """Модель подписки."""
+    user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+    following = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор рецепта',
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'following'), name="unique_followers"
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('following')),
+                name='do not selffollow'),
+        ]
+
+    def __str__(self):
+        return f'{self.user.username}: {self.following.username}'

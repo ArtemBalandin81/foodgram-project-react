@@ -110,9 +110,9 @@ DJOSER = {
 
     },
     'SERIALIZERS': {
-        'user_create': 'users.serializers.MyUserCreateSerializer',
-        'user': 'users.serializers.MyUserSerializer',
-        'current_user': 'users.serializers.MyUserSerializer',
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
         'set_password': 'djoser.serializers.SetPasswordSerializer',
     },
 }

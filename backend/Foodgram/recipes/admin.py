@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Tag, Recipe, TagRecipe, IngredientRecipe, Ingredient
-from users.models import User
+from users.models import User, Follow
 
 
 @admin.register(User)
@@ -71,3 +71,13 @@ class IngredientRecipeAdmin(admin.ModelAdmin):
     """Управление ингредиентами-рецептами many-to-many в админке"""
     list_display = ('ingredient', 'recipe', 'amount')
     list_editable = ('recipe',)
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    """Управление подписками"""
+    list_display = ('id', 'user', 'following')
+    list_editable = ('following',)
+    search_fields = ('user', 'following')
+    list_filter = ('user', 'following')
+    empty_value_display = '-пусто-'
