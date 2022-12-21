@@ -152,3 +152,33 @@ class IngredientRecipe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} {self.recipe}'
+
+
+class FavoriteRecipe(models.Model):
+    """Модель избранных рецептов: связывает id User и id Recipe."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite_recipes',
+        verbose_name='Пользователь сервиса'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_favorite',
+        verbose_name='Избранный рецепт'
+    )
+
+    class Meta:
+        verbose_name = "Избранный рецепт"
+        verbose_name_plural = "Избранные рецепты"
+        ordering = ['user']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_favorite_model'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} {self.recipe}'

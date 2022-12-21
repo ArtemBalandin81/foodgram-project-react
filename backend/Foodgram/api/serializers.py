@@ -194,3 +194,14 @@ class RecipeSerializerPost(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class RecipeFavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для избранного."""
+
+    class Meta:
+        model = Recipe
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time')

@@ -1,8 +1,11 @@
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, permissions, viewsets
+from rest_framework import filters, permissions, viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import permission_classes
+from django.http import HttpResponse
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 )
@@ -12,14 +15,15 @@ from .permissions import (
 )
 
 from recipes.models import (
-    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe,
+    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, FavoriteRecipe
 )
 
 from .serializers import (
     TagSerializer,
     IngredientSerializer,
     RecipeSerializer,
-    RecipeSerializerPost
+    RecipeSerializerPost,
+    RecipeFavoriteSerializer
 )
 
 
@@ -57,3 +61,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ('retrieve', 'list'):
             return RecipeSerializer
         return RecipeSerializerPost
+
+
+class FavoriteViewSet(viewsets.ViewSet):
+    """Вьюсет для создания и удаления избранного рецепта."""
+
+    def create(self, request, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        if not request.user.favorite_recipes.filter(recipe=recipe).exists():
+            FavoriteRecipe.objects.create(
+                user=request.user,
+                recipe=recipe
+            )
+            serializer = RecipeFavoriteSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(
+            {'errors': 'Рецепт уже добавлен в избранное'},
+            status.HTTP_400_BAD_REQUEST
+        )
+
+    def destroy(self, request, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        data_favorite = request.user.favorite_recipes.filter(recipe=recipe)
+        if data_favorite.exists():
+            data_favorite.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'errors': 'Рецепта для удаления не существует'},
+            status.HTTP_400_BAD_REQUEST
+        )

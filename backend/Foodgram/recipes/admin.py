@@ -1,19 +1,54 @@
 from django.contrib import admin
 
-from .models import Tag, Recipe, TagRecipe, IngredientRecipe, Ingredient
+from .models import (Tag,
+                     Recipe,
+                     TagRecipe,
+                     IngredientRecipe,
+                     Ingredient,
+                     FavoriteRecipe)
 from users.models import User, Follow
+
+
+@admin.register(FavoriteRecipe)
+class FavoriteRecipeAdmin(admin.ModelAdmin):
+    """Управление избранными рецептами в админке."""
+    list_display = ('id', 'user', 'recipe')
+    list_editable = ('recipe',)
+
+
+class FavoriteRecipeInline(admin.TabularInline):
+    """Добавление избранных рецептов при администрировании пользователя."""
+    model = FavoriteRecipe
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'password')
+    list_display = ('username', 'email', 'password', 'favorite_recipes')
     list_editable = ('email',)
     list_filter = ('username', 'email')
     search_fields = ('username', 'email')
+    inlines = [
+        FavoriteRecipeInline
+    ]
+
+    def	favorite_recipes(self, row):
+        """Отображение избранных рецептов."""
+        return ', '.join([x.recipe.name for x in row.favorite_recipes.all()])
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    """Управление подписками."""
+    list_display = ('id', 'user', 'following')
+    list_editable = ('following',)
+    search_fields = ('user', 'following')
+    list_filter = ('user', 'following')
+    empty_value_display = '-пусто-'
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    """Управление тегами в админке"""
+    """Управление тегами в админке."""
     list_display = ('id', 'name', 'color', 'slug')
     list_editable = ('color', 'slug')
     prepopulated_fields = {'slug': ('name',)}
@@ -21,24 +56,24 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    """Управление ингредиентами в админке"""
+    """Управление ингредиентами в админке."""
     list_display = ('id', 'name', 'measurement_unit')
     list_editable = ('measurement_unit',)
 
 
 class TagInline(admin.TabularInline):
-    """Добавление тегов many-to-many при администрировании рецептов"""
+    """Добавление тегов many-to-many при администрировании рецептов."""
     model = TagRecipe
 
 
 class IngredientInline(admin.TabularInline):
-    """Добавление ингредиентов many-to-many при администрировании рецептов"""
+    """Добавление ингредиентов many-to-many при администрировании рецептов."""
     model = IngredientRecipe
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    """Управление рецептами в админке"""
+    """Управление рецептами в админке."""
     list_display = (
         'author', 'name', 'image', 'text', 'pub_date',
         'cooking_time', 'display_tags', 'display_ingredients'
@@ -51,33 +86,23 @@ class RecipeAdmin(admin.ModelAdmin):
     ]
 
     def	display_tags(self, row):
-        """Отображения тегов many-to-many при администрировании рецептов"""
+        """Отображения тегов many-to-many при администрировании рецептов."""
         return ', '.join([x.name for x in row.tags.all()])
 
     def	display_ingredients(self, row):
-        """Отображения ingredients при администрировании рецептов"""
+        """Отображения ingredients при администрировании рецептов."""
         return ', '.join([x.name for x in row.ingredients.all()])
 
 
 @admin.register(TagRecipe)
 class TagRecipeAdmin(admin.ModelAdmin):
-    """Управление тегами-рецептами many-to-many в админке"""
+    """Управление тегами-рецептами many-to-many в админке."""
     list_display = ('tag', 'recipe')
     list_editable = ('recipe',)
 
 
 @admin.register(IngredientRecipe)
 class IngredientRecipeAdmin(admin.ModelAdmin):
-    """Управление ингредиентами-рецептами many-to-many в админке"""
+    """Управление ингредиентами-рецептами many-to-many в админке."""
     list_display = ('ingredient', 'recipe', 'amount')
     list_editable = ('recipe',)
-
-
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    """Управление подписками"""
-    list_display = ('id', 'user', 'following')
-    list_editable = ('following',)
-    search_fields = ('user', 'following')
-    list_filter = ('user', 'following')
-    empty_value_display = '-пусто-'
