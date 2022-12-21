@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Управление тегами в админке"""
-    list_display = ('name', 'color', 'slug')
+    list_display = ('id', 'name', 'color', 'slug')
     list_editable = ('color', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
@@ -22,7 +22,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     """Управление ингредиентами в админке"""
-    list_display = ('name', 'measurement_unit')
+    list_display = ('id', 'name', 'measurement_unit')
     list_editable = ('measurement_unit',)
 
 

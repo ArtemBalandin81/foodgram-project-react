@@ -7,6 +7,10 @@ from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 )
 
+from .permissions import (
+    AdminOrAuthorOrIsReadOnly,
+)
+
 from recipes.models import (
     Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe,
 )
@@ -15,6 +19,7 @@ from .serializers import (
     TagSerializer,
     IngredientSerializer,
     RecipeSerializer,
+    RecipeSerializerPost
 )
 
 
@@ -24,9 +29,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    # permission_classes = (IsAdminOrReadOnly,)
-    # filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    # search_fields = ('slug',)
 
 
 @permission_classes([AllowAny])
@@ -39,9 +41,19 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
+
 @permission_classes([IsAuthenticatedOrReadOnly])
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет (контроллер) для модели Recipe."""
-    #queryset = Recipe.objects.all().annotate(amount='ingredients__amount')
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    permission_classes = [
+        AdminOrAuthorOrIsReadOnly,
+    ]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action in ('retrieve', 'list'):
+            return RecipeSerializer
+        return RecipeSerializerPost

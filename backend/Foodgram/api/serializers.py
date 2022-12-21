@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from djoser.serializers import UserSerializer, UserCreateSerializer
+#from djoser.serializers import UserSerializer, UserCreateSerializer
+from users.serializers import CustomUserSerializer
 
 from recipes.models import (
     Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe
@@ -36,11 +38,13 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'color', 'slug')
 
 
+# из модели IngredientRecipe оставили лишь amount и переопределили остальное
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели IngredientRecipe."""
-    name = serializers.SlugField(source='ingredient.name')
+    name = serializers.SlugField(source='ingredient.name', read_only=True)
     measurement_unit = serializers.SlugField(
-        source='ingredient.measurement_unit'
+        source='ingredient.measurement_unit',
+        read_only=True
     )
     id = serializers.IntegerField(source='ingredient.id')
 
@@ -51,6 +55,10 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Ingredient."""
+    #name = serializers.StringRelatedField(many=True, read_only=True)
+    #measurement_unit = serializers.StringRelatedField(
+    #    many=True, read_only=True
+    #)
 
     class Meta:
         model = Ingredient
@@ -58,30 +66,131 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Recipe."""
-    author = UserSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-    #ingredients = IngredientSerializer(many=True, read_only=True)
+    """Сериализатор для модели Recipe. Метод GET"""
+    author = CustomUserSerializer(read_only=True)
+    tags = TagSerializer(
+        many=True,
+        read_only=True
+    )
     ingredients = IngredientRecipeSerializer(
         source='recipe_ingredient',
         many=True,
         read_only=True
     )
-    image = Base64ImageField(required=False, allow_null=True)
+    image = Base64ImageField(required=True)
     # ИСПРАВИТЬ: пока тут "затычка"
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favorited',
-            'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',
-        )
+        fields = ('id',
+                  'tags',
+                  'author',
+                  'ingredients',
+                  'is_favorited',
+                  'is_in_shopping_cart',
+                  'name',
+                  'image',
+                  'text',
+                  'cooking_time')
 
     # ИСПРАВИТЬ: пока тут "затычка"
     def get_is_favorited(self, obj):
+        """Метод для избранного."""
         return 'true'
 
     def get_is_in_shopping_cart(self, obj):
+        """Метод для списка покупок."""
         return 'true'
+
+
+class RecipeSerializerPost(serializers.ModelSerializer):
+    """Сериализатор для модели Recipe. Метод POST"""
+    author = CustomUserSerializer(read_only=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects)
+    ingredients = IngredientRecipeSerializer(
+        source='recipe_ingredient',
+        many=True,
+        # read_only=True
+    )
+    image = Base64ImageField(use_url=False, required=True)
+    cooking_time = serializers.IntegerField(
+        validators=[MinValueValidator(1)]
+    )
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id',
+                  'tags',
+                  'author',
+                  'ingredients',
+                  'is_favorited',
+                  'is_in_shopping_cart',
+                  'name',
+                  'image',
+                  'text',
+                  'cooking_time')
+
+    # ИСПРАВИТЬ: пока тут "затычка"
+    def get_is_favorited(self, obj):
+        """Метод для избранного."""
+        return 'true'
+
+    def get_is_in_shopping_cart(self, obj):
+        """Метод для списка покупок."""
+        return 'true'
+
+
+    def create(self, validated_data):
+        """Метод для создания рецепта."""
+        ingredients = validated_data.pop('recipe_ingredient')
+        tags = validated_data.pop('tags')
+
+        recipe = super().create(validated_data)
+        recipe.tags.set(tags)
+
+        IngredientRecipe.objects.bulk_create(
+            [
+                IngredientRecipe(
+                    ingredient_id=ingredient['ingredient']['id'],
+                    amount=ingredient['amount'],
+                    recipe=recipe
+                )
+                for ingredient in ingredients
+            ]
+        )
+
+        return recipe
+
+    def update(self, instance, validated_data):
+        """Метод для обновления рецепта."""
+        ingredients = validated_data.pop('recipe_ingredient')
+        #tags = validated_data.pop('tags')
+        #super().update(self, instance, validated_data)
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image)
+        instance.cooking_time = (
+            validated_data.get('cooking_time', instance.cooking_time)
+        )
+        instance.tags.set(validated_data.get('tags', instance.tags))
+        instance.ingredients.clear()
+        instance.save()
+
+        IngredientRecipe.objects.bulk_create(
+            [
+                IngredientRecipe(
+                    ingredient_id=ingredient['ingredient']['id'],
+                    amount=ingredient['amount'],
+                    recipe=instance
+                )
+                for ingredient in ingredients
+            ]
+        )
+
+        instance.save()
+        return instance
