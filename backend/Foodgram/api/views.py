@@ -8,7 +8,7 @@ from rest_framework.permissions import (
 )
 
 from .permissions import (
-    AdminOrAuthorOrIsReadOnly,
+    IsAuthorOrReadOnly,
 )
 
 from recipes.models import (
@@ -42,12 +42,12 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('^name',)
 
 
-@permission_classes([IsAuthenticatedOrReadOnly])
+#@permission_classes([IsAuthenticatedOrReadOnly])
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет (контроллер) для модели Recipe."""
     queryset = Recipe.objects.all()
     permission_classes = [
-        AdminOrAuthorOrIsReadOnly,
+        IsAuthorOrReadOnly,
     ]
 
     def perform_create(self, serializer):
