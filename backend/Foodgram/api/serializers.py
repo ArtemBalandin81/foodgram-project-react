@@ -6,7 +6,7 @@ from rest_framework import serializers
 from users.serializers import CustomUserSerializer
 
 from recipes.models import (
-    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe
+    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, FavoriteRecipe
 )
 from users.models import User
 import base64
@@ -78,7 +78,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         read_only=True
     )
     image = Base64ImageField(required=True)
-    # ИСПРАВИТЬ: пока тут "затычка"
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -95,10 +94,16 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'text',
                   'cooking_time')
 
-    # ИСПРАВИТЬ: пока тут "затычка"
     def get_is_favorited(self, obj):
-        """Метод для избранного."""
-        return 'true'
+        """Метод для извлечения избранного true/false."""
+        if (
+            self.context['request'].user.is_authenticated
+            and obj.recipe_favorite.filter(
+                user=self.context['request'].user
+            ).exists()
+        ):
+            return True
+        return False
 
     def get_is_in_shopping_cart(self, obj):
         """Метод для списка покупок."""
@@ -134,10 +139,17 @@ class RecipeSerializerPost(serializers.ModelSerializer):
                   'text',
                   'cooking_time')
 
-    # ИСПРАВИТЬ: пока тут "затычка"
     def get_is_favorited(self, obj):
-        """Метод для избранного."""
-        return 'true'
+        """Метод для извлечения избранного true/false."""
+        if (
+            self.context['request'].user.is_authenticated
+            and obj.recipe_favorite.filter(
+                user=self.context['request'].user
+            ).exists()
+        ):
+            return True
+        return False
+
 
     def get_is_in_shopping_cart(self, obj):
         """Метод для списка покупок."""
