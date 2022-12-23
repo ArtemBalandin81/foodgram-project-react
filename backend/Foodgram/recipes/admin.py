@@ -5,7 +5,8 @@ from .models import (Tag,
                      TagRecipe,
                      IngredientRecipe,
                      Ingredient,
-                     FavoriteRecipe)
+                     FavoriteRecipe,
+                     ShoppingCart)
 from users.models import User, Follow
 
 
@@ -21,19 +22,38 @@ class FavoriteRecipeInline(admin.TabularInline):
     model = FavoriteRecipe
 
 
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    """Управление списком покупок в админке."""
+    list_display = ('id', 'user', 'recipe')
+    list_editable = ('recipe',)
+
+
+class ShoppingCartInline(admin.TabularInline):
+    """Добавление списка покупок при администрировании пользователя."""
+    model = ShoppingCart
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'password', 'favorite_recipes')
+    """Управление пользователями."""
+    list_display = (
+        'username', 'email', 'password', 'favorite_recipes', 'shopping_recipes'
+    )
     list_editable = ('email',)
     list_filter = ('username', 'email')
     search_fields = ('username', 'email')
     inlines = [
-        FavoriteRecipeInline
+        FavoriteRecipeInline, ShoppingCartInline
     ]
 
     def	favorite_recipes(self, row):
         """Отображение избранных рецептов."""
         return ', '.join([x.recipe.name for x in row.favorite_recipes.all()])
+
+    def	shopping_recipes(self, row):
+        """Отображение избранных рецептов."""
+        return ', '.join([x.recipe.name for x in row.shopping_recipes.all()])
 
 
 @admin.register(Follow)

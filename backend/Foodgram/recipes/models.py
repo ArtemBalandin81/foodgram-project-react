@@ -182,3 +182,33 @@ class FavoriteRecipe(models.Model):
 
     def __str__(self):
         return f'{self.user.username} {self.recipe}'
+
+
+class ShoppingCart(models.Model):
+    """Модель списка покупок: связывает id User и id Recipe."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_recipes',
+        verbose_name='Пользователь-покупатель'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_shopping_list',
+        verbose_name='Рецепт для покупки'
+    )
+
+    class Meta:
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Список покупок"
+        ordering = ['user']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shopping_list_model'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} {self.recipe}'

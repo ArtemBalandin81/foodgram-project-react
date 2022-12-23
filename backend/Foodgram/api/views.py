@@ -2,6 +2,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import RecipeFilter
 from rest_framework import filters, permissions, viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import permission_classes
@@ -14,17 +16,19 @@ from .permissions import (
     IsAuthorOrReadOnly,
 )
 
-from recipes.models import (
-    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, FavoriteRecipe
-)
+from recipes.models import (Tag,
+                            Ingredient,
+                            Recipe,
+                            TagRecipe,
+                            IngredientRecipe,
+                            FavoriteRecipe,
+                            ShoppingCart)
 
-from .serializers import (
-    TagSerializer,
-    IngredientSerializer,
-    RecipeSerializer,
-    RecipeSerializerPost,
-    RecipeFavoriteSerializer
-)
+from .serializers import (TagSerializer,
+                          IngredientSerializer,
+                          RecipeSerializer,
+                          RecipeSerializerPost,
+                          RecipeFavoriteSerializer)
 
 
 @permission_classes([AllowAny])
@@ -53,6 +57,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthorOrReadOnly,
     ]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -85,6 +91,37 @@ class FavoriteViewSet(viewsets.ViewSet):
     def destroy(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         data_favorite = request.user.favorite_recipes.filter(recipe=recipe)
+        if data_favorite.exists():
+            data_favorite.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'errors': 'Рецепта для удаления не существует'},
+            status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ShoppingViewSet(viewsets.ViewSet):
+    """Вьюсет для добавления и удаления рецепта в/из списка покупок."""
+
+    def create(self, request, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        if not request.user.shopping_recipes.filter(recipe=recipe).exists():
+            ShoppingCart.objects.create(
+                user=request.user,
+                recipe=recipe
+            )
+            serializer = RecipeFavoriteSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(
+            {'errors': 'Рецепт уже добавлен в список на покупки'},
+            status.HTTP_400_BAD_REQUEST
+        )
+
+    def destroy(self, request, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        data_favorite = request.user.shopping_recipes.filter(recipe=recipe)
         if data_favorite.exists():
             data_favorite.delete()
             return Response(status.HTTP_204_NO_CONTENT)

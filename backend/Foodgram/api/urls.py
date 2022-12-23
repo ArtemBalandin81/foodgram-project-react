@@ -3,12 +3,11 @@ from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import (
-    TagViewSet,
-    IngredientViewSet,
-    RecipeViewSet,
-    FavoriteViewSet,
-)
+from .views import (TagViewSet,
+                    IngredientViewSet,
+                    RecipeViewSet,
+                    FavoriteViewSet,
+                    ShoppingViewSet)
 
 
 router_v1 = DefaultRouter()
@@ -26,6 +25,10 @@ app_name = 'api'
 urlpatterns = [
     path('', include(router_v1.urls)),
     path('recipes/<int:recipe_id>/favorite/', FavoriteViewSet.as_view({
+        'post': 'create',
+        'delete': 'destroy'
+    }), name='favorite'),
+    path('recipes/<int:recipe_id>/shopping_cart/', ShoppingViewSet.as_view({
         'post': 'create',
         'delete': 'destroy'
     }), name='favorite'),

@@ -106,8 +106,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def get_is_in_shopping_cart(self, obj):
-        """Метод для списка покупок."""
-        return 'true'
+        """Метод для списка покупок true/false."""
+        if (
+            self.context['request'].user.is_authenticated
+            and obj.recipe_shopping_list.filter(
+                user=self.context['request'].user
+            ).exists()
+        ):
+            return True
+        return False
 
 
 class RecipeSerializerPost(serializers.ModelSerializer):
@@ -150,10 +157,16 @@ class RecipeSerializerPost(serializers.ModelSerializer):
             return True
         return False
 
-
     def get_is_in_shopping_cart(self, obj):
-        """Метод для списка покупок."""
-        return 'true'
+        """Метод для списка покупок true/false."""
+        if (
+            self.context['request'].user.is_authenticated
+            and obj.recipe_shopping_list.filter(
+                user=self.context['request'].user
+            ).exists()
+        ):
+            return True
+        return False
 
 
     def create(self, validated_data):
