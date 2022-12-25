@@ -71,29 +71,3 @@ class FollowSerializer(CustomUserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-
-
-
-# Эксперементальный класс создания подписки на основании модели Follow
-# 201 - response не соответствует требованиям ТЗ
-class FollowCreateSerializer(serializers.ModelSerializer):
-    """Сериализатор методов PUT, Delete подписок пользователя."""
-
-    class Meta:
-        model = Follow
-        fields = ('user', 'following')
-        read_only_fields = ('user', 'following')
-'''       
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=('user', 'following')
-            )
-        ]
-'''
-'''
-    def validate_following(self, value):
-        if self.context['request'].user == value:
-            raise serializers.ValidationError('Подписка на себя запрещена!')
-        return value
-'''

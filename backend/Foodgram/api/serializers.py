@@ -9,23 +9,15 @@ from rest_framework import serializers
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
                             Recipe, Tag, TagRecipe)
 from users.models import User
-#from djoser.serializers import UserSerializer, UserCreateSerializer
-from users.serializers import CustomUserSerializer
 
-# from recipes.validators import validate_color
+from users.serializers import CustomUserSerializer
 
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
-        # Если полученный объект строка, и она начинается с 'data:image'...
         if isinstance(data, str) and data.startswith('data:image'):
-            # ...начинаем декодировать изображение из base64.
-            # Сначала нужно разделить строку на части.
             format, imgstr = data.split(';base64,')
-            # И извлечь расширение файла.
             ext = format.split('/')[-1]
-            # Затем декодировать сами данные и поместить результат в файл,
-            # которому дать название по шаблону.
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
@@ -38,7 +30,6 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'color', 'slug')
 
 
-# из модели IngredientRecipe оставили лишь amount и переопределили остальное
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели IngredientRecipe."""
     name = serializers.SlugField(source='ingredient.name', read_only=True)
@@ -55,10 +46,6 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Ingredient."""
-    #name = serializers.StringRelatedField(many=True, read_only=True)
-    #measurement_unit = serializers.StringRelatedField(
-    #    many=True, read_only=True
-    #)
 
     class Meta:
         model = Ingredient
@@ -124,7 +111,6 @@ class RecipeSerializerPost(serializers.ModelSerializer):
     ingredients = IngredientRecipeSerializer(
         source='recipe_ingredient',
         many=True,
-        # read_only=True
     )
     image = Base64ImageField(use_url=False, required=True)
     cooking_time = serializers.IntegerField(
@@ -193,8 +179,6 @@ class RecipeSerializerPost(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Метод для обновления рецепта."""
         ingredients = validated_data.pop('recipe_ingredient')
-        #tags = validated_data.pop('tags')
-        #super().update(self, instance, validated_data)
 
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)

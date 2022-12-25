@@ -7,9 +7,6 @@ from users.models import User
 
 from .validators import validate_color
 
-# Используем свою модель пользователи из приложения users!!!
-#User = get_user_model()
-
 
 class Tag(models.Model):
     """Модель тега"""

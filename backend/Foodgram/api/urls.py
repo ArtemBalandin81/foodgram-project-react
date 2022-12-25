@@ -10,11 +10,6 @@ router_v1 = DefaultRouter()
 router_v1.register(r'tags', TagViewSet, basename='tags')
 router_v1.register(r'ingredients', IngredientViewSet, basename='ingredients')
 router_v1.register(r'recipes', RecipeViewSet, basename='ingredients')
-#router_v1.register(
-#    r'recipes/(?P<recipe_id>\d+)/favorite',
-#    FavoriteViewSet,
-#    basename='favorite'
-#)
 
 
 app_name = 'api'
