@@ -1,10 +1,9 @@
-from django.urls import include, path
 from django.conf.urls import url
+from django.urls import include, path
+from djoser.views import UserViewSet
 from rest_framework.routers import DefaultRouter
 
-from djoser.views import UserViewSet
 from .views import FollowViewSet, SubscribeViewSet
-
 
 router_v1 = DefaultRouter()
 router_v1.register(r'users/subscriptions', FollowViewSet, basename='follow')

@@ -1,18 +1,13 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import filters, permissions, viewsets, mixins, status
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import permission_classes
 #from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework.decorators import permission_classes
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from django.http import JsonResponse
 
-from .models import User, Follow
-
-from .serializers import (
-    FollowSerializer,
-    FollowCreateSerializer
-)
+from .models import Follow, User
+from .serializers import FollowCreateSerializer, FollowSerializer
 
 
 class FollowViewSet(viewsets.ModelViewSet):

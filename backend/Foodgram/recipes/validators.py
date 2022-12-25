@@ -1,4 +1,5 @@
 import re
+
 from django.core.exceptions import ValidationError
 
 PATTERN = r'^#(?:[0-9a-fA-F]{1,2}){3}$'

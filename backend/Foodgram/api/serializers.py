@@ -1,16 +1,17 @@
+import base64
+
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
+                            Recipe, Tag, TagRecipe)
+from users.models import User
 #from djoser.serializers import UserSerializer, UserCreateSerializer
 from users.serializers import CustomUserSerializer
 
-from recipes.models import (
-    Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, FavoriteRecipe
-)
-from users.models import User
-import base64
-from django.core.files.base import ContentFile
 # from recipes.validators import validate_color
 
 

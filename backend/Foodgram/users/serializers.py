@@ -1,12 +1,12 @@
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from djoser.serializers import UserSerializer, UserCreateSerializer
 
-from .models import User, Follow
 from recipes.models import Recipe
 
-from django.core.files.base import ContentFile
+from .models import Follow, User
 
 
 class CustomUserSerializer(UserSerializer):

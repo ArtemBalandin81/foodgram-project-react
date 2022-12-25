@@ -1,38 +1,23 @@
-from rest_framework.decorators import action
 from django.db.models import Sum
-from rest_framework.response import Response
-from django.http import FileResponse
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import RecipeFilter
-from rest_framework import filters, permissions, viewsets, status
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action, permission_classes
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import permission_classes
-from django.http import HttpResponse
-from rest_framework.permissions import (
-    IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
-)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
 
-from .permissions import (
-    IsAuthorOrReadOnly,
-)
-
-from recipes.models import (Tag,
-                            Ingredient,
-                            Recipe,
-                            TagRecipe,
-                            IngredientRecipe,
-                            FavoriteRecipe,
-                            ShoppingCart)
-
-from .serializers import (TagSerializer,
-                          IngredientSerializer,
-                          RecipeSerializer,
-                          RecipeSerializerPost,
-                          RecipeFavoriteSerializer)
-
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
+                            Recipe, ShoppingCart, Tag, TagRecipe)
 from services.create_pdf import create_pdf
+
+from .filters import RecipeFilter
+from .permissions import IsAuthorOrReadOnly
+from .serializers import (IngredientSerializer, RecipeFavoriteSerializer,
+                          RecipeSerializer, RecipeSerializerPost,
+                          TagSerializer)
 
 
 @permission_classes([AllowAny])

@@ -2,8 +2,10 @@ from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+
+from users.models import User
+
 from .validators import validate_color
-from users.models import (User,)
 
 # Используем свою модель пользователи из приложения users!!!
 #User = get_user_model()
