@@ -1,5 +1,7 @@
 from rest_framework.decorators import action
+from django.db.models import Sum
 from rest_framework.response import Response
+from django.http import FileResponse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -30,6 +32,8 @@ from .serializers import (TagSerializer,
                           RecipeSerializerPost,
                           RecipeFavoriteSerializer)
 
+from services.create_pdf import create_pdf
+
 
 @permission_classes([AllowAny])
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -45,12 +49,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    # permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
 
-#@permission_classes([IsAuthenticatedOrReadOnly])
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет (контроллер) для модели Recipe."""
     queryset = Recipe.objects.all()
@@ -67,6 +69,39 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ('retrieve', 'list'):
             return RecipeSerializer
         return RecipeSerializerPost
+
+    @action(
+        methods=['GET', ],
+        url_path='download_shopping_cart',
+        detail=False,
+    )
+    def download_shopping_cart(self, request):
+        """Метод для загрузки списка покупок в формате PDF."""
+
+        user = request.user
+        ingredient_list_user = (
+            IngredientRecipe.objects.
+            prefetch_related('ingredient', 'recipe').
+            filter(recipe__recipe_shopping_list__user=user).
+            values('ingredient__id').
+            order_by('ingredient__id')
+        )
+
+        shopping_list = (
+            ingredient_list_user.annotate(amount=Sum('amount')).
+            values_list(
+                'ingredient__name', 'ingredient__measurement_unit', 'amount'
+            )
+        )
+
+        file = create_pdf(shopping_list, 'Список покупок')
+
+        return FileResponse(
+            file,
+            as_attachment=True,
+            filename='shopping_list.pdf',
+            status=status.HTTP_200_OK
+        )
 
 
 class FavoriteViewSet(viewsets.ViewSet):

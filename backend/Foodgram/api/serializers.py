@@ -32,7 +32,6 @@ class Base64ImageField(serializers.ImageField):
 
 class TagSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Tag."""
-    # color = serializers.CharField(validators=[validate_color])
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')

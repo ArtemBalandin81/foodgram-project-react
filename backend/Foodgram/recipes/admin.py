@@ -79,7 +79,7 @@ class IngredientAdmin(admin.ModelAdmin):
     """Управление ингредиентами в админке."""
     list_display = ('id', 'name', 'measurement_unit')
     list_editable = ('measurement_unit',)
-
+    list_filter = ('name',)
 
 class TagInline(admin.TabularInline):
     """Добавление тегов many-to-many при администрировании рецептов."""
@@ -95,11 +95,11 @@ class IngredientInline(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     """Управление рецептами в админке."""
     list_display = (
-        'author', 'name', 'image', 'text', 'pub_date',
-        'cooking_time', 'display_tags', 'display_ingredients'
+        'author', 'name', 'image', 'text', 'pub_date', 'cooking_time',
+        'display_tags', 'display_ingredients', 'get_favorite_count'
     )
     list_editable = ('cooking_time', 'image')
-    list_filter = ('name', 'author', 'tags', 'ingredients')
+    list_filter = ('name', 'author', 'tags',)
     search_fields = ('name', 'text', 'ingredients')
     inlines = [
         IngredientInline, TagInline
@@ -112,6 +112,9 @@ class RecipeAdmin(admin.ModelAdmin):
     def	display_ingredients(self, row):
         """Отображения ingredients при администрировании рецептов."""
         return ', '.join([x.name for x in row.ingredients.all()])
+
+    def get_favorite_count(self, obj):
+        return obj.recipe_favorite.count()
 
 
 @admin.register(TagRecipe)
