@@ -6,7 +6,6 @@ ANTI_PATTERN = r'(?!^[\w.@+-]+\Z).*'
 REGEX_USERNAME = re.compile(r'^[\w.@+-]+\Z')
 
 
-
 def check_username(value):
     """Проверяем, что пользователь не использует имя 'me'."""
     if value == 'me':

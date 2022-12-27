@@ -7,7 +7,6 @@ from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
                             Recipe, Tag, TagRecipe)
 from users.models import User
 from users.serializers import CustomUserSerializer
-
 from .fields import Base64ImageField
 
 
