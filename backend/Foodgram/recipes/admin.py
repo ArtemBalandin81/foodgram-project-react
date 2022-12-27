@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from users.models import Follow, User
-
 from .models import (FavoriteRecipe, Ingredient, IngredientRecipe, Recipe,
                      ShoppingCart, Tag, TagRecipe)
 
@@ -43,13 +42,15 @@ class UserAdmin(admin.ModelAdmin):
         FavoriteRecipeInline, ShoppingCartInline
     ]
 
-    def	favorite_recipes(self, row):
+    def	favorite_recipes(self, obj):
         """Отображение избранных рецептов."""
-        return ', '.join([x.recipe.name for x in row.favorite_recipes.all()])
+        return [x for x in
+                obj.favorite_recipes.values_list('recipe__name', flat=True)]
 
-    def	shopping_recipes(self, row):
-        """Отображение избранных рецептов."""
-        return ', '.join([x.recipe.name for x in row.shopping_recipes.all()])
+    def	shopping_recipes(self, obj):
+        """Отображение рецептов в списке на покупку."""
+        return [x for x in
+                obj.shopping_recipes.values_list('recipe__name', flat=True)]
 
 
 @admin.register(Follow)
@@ -101,13 +102,13 @@ class RecipeAdmin(admin.ModelAdmin):
         IngredientInline, TagInline
     ]
 
-    def	display_tags(self, row):
+    def	display_tags(self, obj):
         """Отображения тегов many-to-many при администрировании рецептов."""
-        return ', '.join([x.name for x in row.tags.all()])
+        return [x for x in obj.tags.values_list('name', flat=True)]
 
-    def	display_ingredients(self, row):
+    def	display_ingredients(self, obj):
         """Отображения ingredients при администрировании рецептов."""
-        return ', '.join([x.name for x in row.ingredients.all()])
+        return [x for x in obj.ingredients.values_list('name', flat=True)]
 
     def get_favorite_count(self, obj):
         return obj.recipe_favorite.count()

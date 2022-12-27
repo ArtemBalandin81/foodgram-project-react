@@ -4,7 +4,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
-
 from .validators import validate_color
 
 
@@ -128,6 +127,14 @@ class TagRecipe(models.Model):
         related_name='recipe_tag',
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tag', 'recipe'],
+                name='уникальность тегов в рецепте',
+            ),
+        ]
+
     def __str__(self):
         return f'{self.tag} {self.recipe}'
 
@@ -148,6 +155,14 @@ class IngredientRecipe(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Количество ингредиента'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe', 'amount'],
+                name='уникальность ингредиентов в рецепте',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.ingredient} {self.recipe}'

@@ -22,5 +22,5 @@ urlpatterns = [
     path('recipes/<int:recipe_id>/shopping_cart/', ShoppingViewSet.as_view({
         'post': 'create',
         'delete': 'destroy'
-    }), name='favorite'),
+    }), name='shopping_cart'),
 ]
