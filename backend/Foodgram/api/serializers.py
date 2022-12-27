@@ -149,10 +149,8 @@ class RecipeSerializerPost(RecipeSerializer):
         instance = super().update(instance, validated_data)
         instance.tags.set(validated_data.get('tags', instance.tags))
         instance.ingredients.clear()
-        instance.save()
 
         self.add_ingredients_recipe(ingredients, instance)
-        instance.save()
         return instance
 
 
