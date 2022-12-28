@@ -1,11 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
-                            Recipe, Tag, TagRecipe)
-from users.models import User
+from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
 from users.serializers import CustomUserSerializer
 from .fields import Base64ImageField
 

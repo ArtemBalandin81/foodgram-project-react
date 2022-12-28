@@ -1,8 +1,5 @@
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, permissions, status, viewsets
-from rest_framework.decorators import permission_classes
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from .models import Follow, User

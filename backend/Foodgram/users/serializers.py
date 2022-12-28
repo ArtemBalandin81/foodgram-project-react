@@ -1,11 +1,8 @@
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.models import Recipe
-from .models import Follow, User
+from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
@@ -21,10 +18,8 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request_user = self.context.get('request').user
-        return (
-                request_user.is_authenticated and obj.following.filter(
-            user=request_user).exists()
-        )
+        return (request_user.is_authenticated
+                and obj.following.filter(user=request_user).exists())
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

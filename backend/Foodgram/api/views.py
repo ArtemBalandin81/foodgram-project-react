@@ -1,23 +1,18 @@
 from django.db.models import Sum
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, permission_classes
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientRecipe,
-                            Recipe, ShoppingCart, Tag, TagRecipe)
+                            Recipe, ShoppingCart, Tag)
 from services.create_pdf import create_pdf
 from .filters import RecipeFilter
 from .mixins import CustomCreateAndDeleteMixin
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeFavoriteSerializer,
-                          RecipeSerializer, RecipeSerializerPost,
-                          TagSerializer)
+from .serializers import (IngredientSerializer, RecipeSerializer,
+                          RecipeSerializerPost, TagSerializer)
 
 
 @permission_classes([AllowAny])

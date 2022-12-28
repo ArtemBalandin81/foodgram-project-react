@@ -42,12 +42,12 @@ class UserAdmin(admin.ModelAdmin):
         FavoriteRecipeInline, ShoppingCartInline
     ]
 
-    def	favorite_recipes(self, obj):
+    def favorite_recipes(self, obj):
         """Отображение избранных рецептов."""
         return [x for x in
                 obj.favorite_recipes.values_list('recipe__name', flat=True)]
 
-    def	shopping_recipes(self, obj):
+    def shopping_recipes(self, obj):
         """Отображение рецептов в списке на покупку."""
         return [x for x in
                 obj.shopping_recipes.values_list('recipe__name', flat=True)]
@@ -78,6 +78,7 @@ class IngredientAdmin(admin.ModelAdmin):
     list_editable = ('measurement_unit',)
     list_filter = ('name',)
 
+
 class TagInline(admin.TabularInline):
     """Добавление тегов many-to-many при администрировании рецептов."""
     model = TagRecipe
@@ -102,11 +103,11 @@ class RecipeAdmin(admin.ModelAdmin):
         IngredientInline, TagInline
     ]
 
-    def	display_tags(self, obj):
+    def display_tags(self, obj):
         """Отображения тегов many-to-many при администрировании рецептов."""
         return [x for x in obj.tags.values_list('name', flat=True)]
 
-    def	display_ingredients(self, obj):
+    def display_ingredients(self, obj):
         """Отображения ingredients при администрировании рецептов."""
         return [x for x in obj.ingredients.values_list('name', flat=True)]
 
