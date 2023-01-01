@@ -1,18 +1,31 @@
 import os
+
+from dotenv import load_dotenv
+
 # from pathlib import Path
 
+load_dotenv()
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR2 = Path(__file__).resolve().parent.parent
+# print("base dir path", BASE_DIR)
 
-SECRET_KEY = 'django-insecure-#ar4zv-q=ojge3rqie^ygq0ff3=-t8_t$-mi^692#4hs&n_0(z'
+# SECRET_KEY = 'django-insecure-#ar4zv-q=ojge3rqie^ygq0ff3=-t8_t$-mi^692#4hs&n_0(z'
+SECRET_KEY = os.getenv('SECRET_KEY')
+# print("SECRET_KEY", SECRET_KEY)
 
-DEBUG = True
+# DEBUG = True
+DEBUG = os.getenv('DEBUG', default=True)
+# print("DEBUG", DEBUG)
 
 AUTH_USER_MODEL = 'users.User'
 
 NAME_MAX_LENGTH = 150
 EMAIL_MAX_LENGTH = 254
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*')
+# print("ALLOWED_HOSTS", ALLOWED_HOSTS)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -63,13 +76,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Foodgram.wsgi.application'
 
 
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': os.getenv(
+            'DB_NAME', default=os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
+        'PORT': os.getenv('DB_PORT', default=5432)
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -129,7 +153,12 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+# если статика перенесена в одно из приложений проекта, то:
+# STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'api/static'),
+# ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
