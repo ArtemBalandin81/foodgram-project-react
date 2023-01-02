@@ -25,12 +25,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 @permission_classes([AllowAny])
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """Вьюсет (контроллер) для модели Tag."""
+    """Вьюсет (контроллер) для модели Ingredient."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    search_fields = ('^name', 'name')
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
