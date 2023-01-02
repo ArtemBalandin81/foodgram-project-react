@@ -43,8 +43,7 @@ class RecipeFilter(filters.FilterSet):
 
 class IngredientFilter(filters.FilterSet):
     """Фильтр выбора ингредиентов."""
-    # name = filters.CharFilter(lookup_expr='istartswith')
-    name = filters.CharFilter(lookup_expr='icontains')
+    name = filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
         model = Ingredient
