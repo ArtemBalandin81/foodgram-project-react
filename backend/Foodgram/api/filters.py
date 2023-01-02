@@ -1,4 +1,4 @@
-from django_filters import rest_framework as filters
+import django_filters as filters
 
 from recipes.models import Ingredient, Recipe, Tag
 
@@ -43,7 +43,8 @@ class RecipeFilter(filters.FilterSet):
 
 class IngredientFilter(filters.FilterSet):
     """Фильтр выбора ингредиентов."""
-    name = filters.CharFilter(lookup_expr='istartswith')
+    #name = filters.CharFilter(lookup_expr='istartswith')
+    name = filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Ingredient
