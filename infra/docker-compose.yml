@@ -42,7 +42,9 @@ services:
       - media_value:/media/
       #- ../frontend/build:/usr/share/nginx/html/
       - frontend_value:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
+      #- ../docs/:/usr/share/nginx/html/api/docs/
+      # каталог /docs перенесли в корень ВМ через csp - меняем путь к нему:
+      - ./docs/:/usr/share/nginx/html/api/docs/
 
       #- static_value:/var/html/static/
       #- media_value:/var/html/media/
