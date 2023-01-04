@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # print("SECRET_KEY", SECRET_KEY)
 
 # DEBUG = True
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default=False)
 # print("DEBUG", DEBUG)
 
 AUTH_USER_MODEL = 'users.User'

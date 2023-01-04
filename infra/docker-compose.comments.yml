@@ -9,6 +9,7 @@ services:
       - ./.env
 
   backend:
+    # image: tom9981/foodgram_backend:v3
     image: tom9981/foodgram_backend:latest
     restart: always
     volumes:
@@ -21,7 +22,11 @@ services:
 
   frontend:
     image: tom9981/foodgram_frontend:latest
+    # build:
+    #  context: ../frontend
+    #  dockerfile: Dockerfile
     volumes:
+    #  - ../frontend/:/app/result_build/
       - frontend_value:/app/result_build/build
     depends_on:
       - backend
@@ -35,8 +40,14 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - static_value:/static/
       - media_value:/media/
+      #- ../frontend/build:/usr/share/nginx/html/
       - frontend_value:/usr/share/nginx/html/
+      #- ../docs/:/usr/share/nginx/html/api/docs/
+      # каталог /docs перенесли в корень ВМ через csp - меняем путь к нему:
       - ./docs/:/usr/share/nginx/html/api/docs/
+
+      #- static_value:/var/html/static/
+      #- media_value:/var/html/media/
     depends_on:
       - backend
       - frontend
