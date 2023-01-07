@@ -13,10 +13,10 @@ def create_pdf(data: list, title: str) -> TextIO:
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     items_per_page = 20
-    Pdf_pages = max(0, (data.count()-1)) // items_per_page + 1
+    pdf_pages = max(0, (data.count() - 1)) // items_per_page + 1
 
     counter = 0
-    while counter < Pdf_pages:
+    while counter < pdf_pages:
         pdfmetrics.registerFont(
             TTFont('AlfiosBold', './static/AlfiosBold.ttf')
         )
@@ -32,7 +32,7 @@ def create_pdf(data: list, title: str) -> TextIO:
             y,
             f'{title}'
             f' ({items_per_page}/{data.count()-items_per_page*counter}'
-            f' поз., стр: {counter+1}/{Pdf_pages}):'
+            f' поз., стр: {counter+1}/{pdf_pages}):'
         )
         y -= 40
 
