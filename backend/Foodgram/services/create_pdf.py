@@ -12,10 +12,11 @@ def create_pdf(data: list, title: str) -> TextIO:
     """ Создает pdf-файл c помощью ReportLab."""
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
-    items_per_page = 31
+    items_per_page = 30
     pdf_pages = max(0, (data.count() - 1)) // items_per_page + 1
 
     counter = 0
+
     while counter < pdf_pages:
         pdfmetrics.registerFont(
             TTFont('AlfiosBold', './static/AlfiosBold.ttf')
@@ -41,15 +42,16 @@ def create_pdf(data: list, title: str) -> TextIO:
         p.setFillColor(navy)
         start_position = counter * items_per_page
         for i in range(start_position, data.count()):
-            p.drawString(
-                60,
-                y,
-                f'{list(enumerate(data))[i][0]+1}. '  # №
-                f'{list(enumerate(data))[i][1][0].capitalize()} '  # ingredient
-                f'({list(enumerate(data))[i][1][1]}) - '  # measurement_unit
-                f'{list(enumerate(data))[i][1][2]}'  # total
-            )
-            y -= 25
+            if y > 30:
+                p.drawString(
+                    60,
+                    y,
+                    f'{list(enumerate(data))[i][0]+1}. '  # №
+                    f'{list(enumerate(data))[i][1][0].capitalize()} '  # ingredient
+                    f'({list(enumerate(data))[i][1][1]}) - '  # measurement_unit
+                    f'{list(enumerate(data))[i][1][2]}'  # total
+                )
+                y -= 25
 
         p.showPage()
         counter += 1
