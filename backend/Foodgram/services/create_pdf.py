@@ -31,7 +31,8 @@ def create_pdf(data: list, title: str) -> TextIO:
             60,
             y,
             f'{title}'
-            f' ({items_per_page}/{data.count()-items_per_page*counter}'
+            f' ({1+items_per_page*counter} -'
+            f' {min(items_per_page*(counter+1), data.count())}'
             f' поз., стр: {counter+1}/{pdf_pages}):'
         )
         y -= 40
