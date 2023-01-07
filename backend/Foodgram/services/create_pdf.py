@@ -12,7 +12,7 @@ def create_pdf(data: list, title: str) -> TextIO:
     """ Создает pdf-файл c помощью ReportLab."""
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
-    items_per_page = 20
+    items_per_page = 31
     pdf_pages = max(0, (data.count() - 1)) // items_per_page + 1
 
     counter = 0
@@ -49,7 +49,7 @@ def create_pdf(data: list, title: str) -> TextIO:
                 f'({list(enumerate(data))[i][1][1]}) - '  # measurement_unit
                 f'{list(enumerate(data))[i][1][2]}'  # total
             )
-            y -= 40
+            y -= 25
 
         p.showPage()
         counter += 1
