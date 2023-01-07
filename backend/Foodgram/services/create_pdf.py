@@ -47,8 +47,8 @@ def create_pdf(data: list, title: str) -> TextIO:
                     60,
                     y,
                     f'{list(enumerate(data))[i][0]+1}. '  # №
-                    f'{list(enumerate(data))[i][1][0].capitalize()} '  # ingredient
-                    f'({list(enumerate(data))[i][1][1]}) - '  # measurement_unit
+                    f'{list(enumerate(data))[i][1][0].capitalize()} '  # name
+                    f'({list(enumerate(data))[i][1][1]}) - '  # measurem._unit
                     f'{list(enumerate(data))[i][1][2]}'  # total
                 )
                 y -= 25
